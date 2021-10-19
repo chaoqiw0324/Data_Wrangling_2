@@ -1,0 +1,102 @@
+---
+title: "web reading"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+library(rvest)
+library(httr)
+```
+
+## R Markdown
+
+
+
+```{r cars}
+url <- "http://samhda.s3-us-gov-west-1.amazonaws.com/s3fs-public/field-uploads/2k15StateFiles/NSDUHsaeShortTermCHG2015.htm"
+
+drug_use_html <- 
+  read_html(url)
+
+drug_use_df <- 
+  drug_use_html %>% 
+  html_table %>% 
+  first() %>% 
+  slice(-1)
+```
+
+## Star Wars
+get some star wars data
+```{r}
+sw_url <- "https://www.imdb.com/list/ls070150896/"
+
+sw_html <- 
+  read_html(sw_url)
+
+sw_titles <- 
+  html_elements(".lister-item-header a") %>% 
+  html_text()
+
+sw_revenue <-  
+  sw_html %>%
+  html_elements(".text-small:nth-child(7) span:nth-child(5)") %>%
+  html_text()
+
+
+```
+Dynamite reviews
+
+```{r}
+dynamite_url <- "https://www.amazon.com/product-reviews/B00005JNBQ/ref=cm_cr_arp_d_viewopt_rvwer?ie=UTF8&reviewerType=avp_only_reviews&sortBy=recent&pageNumber=1"
+
+dynamatie_html <- 
+  read_html(dynamite_url)
+
+dynamtie_stars <- 
+  dynamatie_html %>% 
+  html_elements("#cm_cr-review_list .review-rating") %>% 
+  html_text()
+
+
+dynamtie_revie_titles <- 
+  dynamatie_html %>% 
+  html_elements(".a-text-bold span") %>% 
+  html_text()
+```
+## Try some APIs
+get some data fram an API
+```{r}
+water_df <- 
+  GET("https://data.cityofnewyork.us/resource/ia2d-e54m.csv") %>% 
+  content()
+```
+Let's see JSON
+```{r}
+water_df <- 
+  GET("https://data.cityofnewyork.us/resource/ia2d-e54m.json") %>% 
+  content("text") %>% 
+  jsonlite::fromJSON() %>% 
+  as_tibble()
+```
+
+BRFSS data via API
+```{r}
+brfss_url <- 
+  GET("https://chronicdata.cdc.gov/resource/acme-vg9e.csv",
+      query = list("$limit" = 5000)) %>% 
+  content()
+```
+
+poke_API
+```{r}
+poke_data <- 
+  GET("https://pokeapi.co/api/v2/pokemon/1") %>% 
+  content()
+
+poke_data[["name"]]
+poke_data[["height"]]
+poke_data[["abilities"]]
+```
+
